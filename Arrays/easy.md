@@ -132,4 +132,161 @@ for(; i < n; i++) {
 
 return j+1;
 ```
+<br><br>
 
+# Left Rotate an array by one place
+#### Brute force:
+- Create another array `temp[]`, Store `arr[n-1]` to `temp[0]`.
+- Then store elements `nums[1]` to `nums[n-1]` in `temp[]`.
+- Store back elements of `temp[]` to `arr[]`.
+
+#### Optimal:
+- Store `temp = arr[0]`.
+- Iterate from `i = 1 to i = n-1`:
+    - store `arr[i-1] = arr[i]`.
+- At last, store `arr[n-1] = temp`.
+```cpp
+int temp = arr[0];
+for(int i = 1; i < n; i++) {
+    arr[i-1] = arr[i];
+}
+arr[n-1] = temp;
+```
+<br><br>
+
+# Left Rotate array by 'k' places
+#### Brute Force:
+- Store first `n-k-1` elements in `temp[]`.
+- Store rest elements of `arr` from `n-k` to `n` in `temp[]`.
+- Now Store all elements of `temp` in `arr`.
+
+#### Optimal:
+- Reverse the whole array first.
+- Reverse first `k` elements of arr.
+- Reverse rest elements from `k+1` to `n`.
+```cpp
+reverse(arr.begin(), arr.end());
+reverse(arr.begin(), arr.begin() + k);
+reverse(arr.begin() + k , arr.end());
+```
+<br><br>
+
+# Move Zeroes to End
+#### Brute Force:
+- Use `temp[]` to store all non-zero elements.
+- Place all elements of `arr[i] = temp[i]`;
+- at end place '0' at the end of arr.
+#### Optimal (Two Pointers):
+- Place pointers `j` to the first zero, `i = j+1`.
+- If there is no 0, we don't need to move ahead.
+- Iterate `i = j+1 to n-1`:
+    - if `arr[i] != 0`:
+        - swap(arr[j], arr[i]);
+        - j++;
+
+### Intuition:
+Why does this works?
+- Pointer `j` is always pointing to '0'. => Thus j must go to the last index, as '0's needed to be moved to last.
+- At first, `j` is first zero that occurs in arr => then we iterate from -> `i+1` to `n-1`.
+- if at any point `arr[i] != 0`, we must swap it by j => making 0 behind.
+- incrementing j so that it points to zero again.
+```cpp
+int j = -1;
+
+for(int i = 0; i < n; i++) {
+    if(arr[i] == 0) {
+        j = i;
+        break;
+    }
+}
+
+for(int i = j+1; i < n; i++) {
+    if(arr[i] != 0) {
+        swap(arr[i], arr[j]);
+        j++;
+    }
+}
+```
+<br><br>
+
+# Linear Search
+- Iterate from `i = 0` to `i = n-1`:
+    - `if(arr[i] == target)`:
+        - return `i`
+- `return -1`;
+
+<br><br>
+
+# Union of two Arrays
+#### Brute Force 1:
+- Store all the elements of arr1 in map.
+- Store all the elements of arr2 in map.
+- Return all elements of map in Union array.
+```cpp
+map<int, int> mpp;
+
+for(int i = 0; i < n; i++;) {
+    mpp[arr1[i]]++;
+}
+
+for(int i = 0; i < n; i++;) {
+    mpp[arr2[i]]++;
+}
+
+vector<int> Union;
+for(auto it: mpp) {
+    Union.push_back(it.first);
+}
+
+return Union;
+```
+
+#### Brute Force 2:
+-- using a set.
+#### Optimal:
+- Place two pointers `i = 0, j = 0`, pointing `i` at `arr1`, and `j` at `arr2`.
+- Iterate till `i < n` and `j < m`:
+    - if(a[i] <= b[j]):
+        - push a[i] in union, i++; (only if union doesn't contains a[i])
+    - else:
+        - push b[j] in union, j++; (only push if union doesn't contains b[j]);
+
+```cpp
+// Given: arr1 (sorted) and arr2(sorted); 
+
+vector<int> union;
+int i = 0, j = 0;
+int n = arr1.size(), m = arr2.size();
+
+while(i < n && j < m) {
+    if(arr1[i] <= arr2[j]) {
+        if(union.empty() || union.back() != arr1[i]) {
+            union.push_back(arr1[i]);
+        }
+        i++;
+    } else {
+        if(union.empty() || union.back() != arr2[j]) {
+            union.push_back(arr2[j]);
+        }
+        j++;
+    }
+}
+
+while(i < n) {
+    if(union.empty() || union.back() != arr1[i]) {
+        union.push_back(arr1[i]);
+    }
+    i++;
+}
+
+while(j< m) {
+    if(union.empty() || union.back() != arr2[j]) {
+        union.push_back(arr2[j]);
+    }
+    j++;
+}
+
+return union;
+```
+
+**NOTE:** Why Union.back() is able to check whether the element is present in union or not? => because arr1 and arr2 both are sorted.
