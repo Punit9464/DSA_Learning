@@ -132,6 +132,18 @@ for(; i < n; i++) {
 
 return j+1;
 ```
+#### Optimal (if array is not sorted):
+- We ca either sort it and follow above approach.
+- or we can use set or map to track visited elements
+```cpp
+int idx = 0;
+unordered_set<int> st;
+run a  loop from i = 0 to n-1
+if(!st.count(arr[i])) {
+    st.insert(arr[i]);
+    arr[idx++] = arr[i];
+}
+```
 <br><br>
 
 # Left Rotate an array by one place
@@ -222,6 +234,7 @@ for(int i = j+1; i < n; i++) {
 - Store all the elements of arr1 in map.
 - Store all the elements of arr2 in map.
 - Return all elements of map in Union array.
+
 ```cpp
 map<int, int> mpp;
 
@@ -290,3 +303,184 @@ return union;
 ```
 
 **NOTE:** Why Union.back() is able to check whether the element is present in union or not? => because arr1 and arr2 both are sorted.
+
+
+<br><br>
+
+# Intersection of two arrays
+#### Brute Force:
+- Select a element in arr1.
+- Find it in second arr2:
+    - maintain a `visited` for it, if you have visited => don't push. eg: `1 2 3` and `1 3 3`. if visited not maintained, 3 will be entered twice into the result.
+    - if the element exists then push it in `result`.
+    - else do nothing.
+```cpp
+for i = 0 to i = n-1:
+    element = arr1[i];
+    for j = 0 to j = m-1:
+        if(element == arr2[j] && visited[j] == 0):
+            result.push(arr1[i]);
+            break
+```
+#### Optimal (Two Pointers):
+- Initialize two pointers `i` and `j` at 0 of arr1 and arr2.
+- `if(arr1[i] < arr2[j])` -> i++;
+- `else if(arr2[j] < arr1[i])` -> j++;
+- `else result.push(arr1[i]);` -> i++; j++;
+
+- **NOTE: if array is not sorted then**
+    - Using, Hash Set.
+    - put all elements of arr1 in set.
+    - traverse through arr2, if `arr2[i]` exists in set, push to `result[]`.
+
+<br><br>
+
+# Missing Number
+#### Brute Force:
+- Take n = size of arr.
+- Iterate from `i = 1` to `i = n`:
+    - Find `i` in arr -> if it doesn't exists return it.
+```cpp
+for i = 1 -> n-1:
+    found = 0;
+    for j = 1 -> n-1:
+        if(arr[j] == i) found = 1;
+    if found == 0 return i;
+```
+
+#### Better:
+- Using hashing store the number of occurences for each element in a array.
+- Iterate through map `for 1 to n`:
+    - if any `map value == 0` -> that element doesn't exists even once in `array`, return it.
+```cpp
+vector<int> hash(n+1, 0);
+for i = 0 to i = n-1:
+    hash[a[i]] += 1;
+
+for i = 1 to i = n:
+    if hash[i] == 0:
+        return i;
+```
+
+#### Optimal 1:
+- Find sum for first n numbers.
+- Find sum for array.
+- Difference between the sum(n) - sum(arr) = missing number.
+```cpp
+sumN = 0;
+for i = 1 to i = n:
+    sumN += i;
+
+sumArr = 0;
+for i = 0 to i = n-1:
+    sumArr += arr[i];
+
+return sumN - sumArr;
+```
+
+#### Optimal 2:
+- Find XOR for first N numbers
+- Find XOR for array elements
+- XOR both the above results = missing number
+```cpp
+xorN = 0, xorArr = 0;
+for i = 1 to i = n:
+    xorN ^= i;
+    xorArr ^= arr[i-1];
+
+return xorN ^ xorArr;
+```
+
+# Find Maximum Consecutive Occurrence of a Number
+- Maintain the count for the targetNumber
+- if you dont find the targetNumber reset the counter to 0.
+- Maintain a maximumCount variable to store the maxiumum Occurrences for targetNumber.
+
+```cpp
+int cnt = 0, maxCnt = INT_MIN;
+for(int i = 0; i < n; i++) {
+    if(arr[i] == target) cnt++;
+    else cnt = 0;
+
+    maxCnt = max(cnt, maxi);
+}
+```
+
+# Find Number that appears once, and other numbers twice
+#### Brute Force:
+- Iterate through `arr` and maintain count for each variable
+- iterate again to count the occurrences for `arr[i];
+- return `arr[i]` if `count == 1`;
+
+```c++
+for(int i = 0; i < n; i++) {
+    int cnt = 0;
+
+    for(int j = 0; j < n; j++) {
+        if(arr[i] == arr[j]) cnt++;
+    }
+
+    if(cnt == 1) return arr[i];
+}
+
+return -1;
+```
+
+#### Better 1 (Use Hashing):
+- use hash vector and maintain count for each arr[i];
+- iterate through hash vector to see count for each arr[i]
+- whereever count is 1 return arr[i]
+
+```cpp
+vector<int> hash(n+1);
+
+for(int i = 0; i < n; i++) {
+    hash[arr[i]]++;
+}
+
+for(int i = 0; i < hash.size(); i++) {
+    if(hash[i] == 1) return 1;
+}
+
+return -1;
+```
+
+
+#### Better 2 (Use Hashing):
+- use a hash map to maintain the count for each variable.
+- iterate through the map to get the count of arr[i] == 1
+- wherever such i exists return it.
+
+```cpp
+unordered_map<int, int> hash;
+
+for(int i = 0; i < n; i++) {
+    hash[arr[i]]++;
+}
+
+for(auto it: mpp) {
+    if(it.second == 1) return it.first;
+}
+
+return -1;
+```
+
+#### Optimal (use XOR):
+- Find XOR for each arr[i]
+### Intuition:
+XOR: `a ^ 0 = a` and 
+XOR: `a ^ a = 0`
+- So arr[i] occuring twice will cancel out them as `a ^ a = 0`
+- So arr[i] with occurrence 1 will be XORed with 0 (xor of rest others).
+- Therefore,  Total of XOR will be arr[i] with occurrence 1.
+
+```cpp
+int xorVal = 0;
+
+for(int i = 0; i < n; i++) {
+    xorVal ^= arr[i];
+}
+
+return xorVal;
+```
+
